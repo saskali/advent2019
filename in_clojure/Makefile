@@ -2,12 +2,17 @@
 
 MAIN_FILES := $(wildcard ./*.clj)
 
-.PHONY: $(MAIN_FILES)
+DIFFS := $(shell ls | grep -e "day_.._part." | grep -o "day_.." | sort | uniq)
+
+.PHONY: $(MAIN_FILES) $(DIFFS) README.md
 
 $(MAIN_FILES):
 	clj -J-ss10000k $@
 
-all: $(MAIN_FILES)
+README.md:
+	echo "# In Clojure\n" > README.md
 
-repl:
-	clj -J-ss10000k -J-Dclojure.server.myrepl="{:port 5555,:accept,clojure.core.server/repl}"
+$(DIFFS): README.md
+	../diff.sh $@ $@_part_1.clj $@_part_2.clj
+
+all: $(MAIN_FILES) $(DIFFS)
